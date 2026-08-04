@@ -18,4 +18,16 @@ class WorkoutStore extends ChangeNotifier {
     _exercises.removeAt(index);
     notifyListeners();
   }
+
+  final Map<String, List<String>> _setsByExercise = {};
+
+  List<String> setsFor(String exercise){
+    return List.unmodifiable(_setsByExercise[exercise] ?? []);
+  }
+
+  void addSet(String exercise, String set){
+    _setsByExercise.putIfAbsent(exercise, () => []);
+    _setsByExercise[exercise]!.insert(0, set);
+    notifyListeners();
+  }
 }

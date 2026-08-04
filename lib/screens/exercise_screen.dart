@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'log_screen.dart';
+import '../state/workout_store.dart';
 
 
 class ExerciseScreen extends StatefulWidget {
@@ -15,17 +17,16 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
   final weightController = TextEditingController();
   final repsController = TextEditingController();
 
-  final List<String> sets = [];
-
   void saveSet(){
     final weight = double.tryParse(weightController.text);
     final reps = int.tryParse(repsController.text);
 
     if(weight == null || reps == null) return;
 
-    setState(() {
-      sets.insert(0, '$weight kg x $reps');
-    });
+    context.read<WorkoutStore>().addSet(
+      widget.exerciseName,
+      '$weight kg x $reps',
+    );
 
     weightController.clear();
     repsController.clear();
@@ -40,6 +41,9 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final store = context.watch<WorkoutStore>();
+    final sets = store.setsFor(widget.exerciseName);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.exerciseName)),
       body: Padding(
