@@ -6,7 +6,7 @@ import 'state/workout_store.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => WorkoutStore(),
+      create: (context) => WorkoutStore()..loadExercises(),
       child: const MyApp(),
     ),
   );
@@ -26,5 +26,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 

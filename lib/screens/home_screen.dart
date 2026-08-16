@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'exercise_screen.dart';
 import '/state/workout_store.dart';
+import '../models/exercise.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -49,35 +50,70 @@ class _HomeScreenState extends State<HomeScreen> {
   
   @override
     Widget build(BuildContext context) {
-       final store = context.watch<WorkoutStore>();
+      final store = context.watch<WorkoutStore>();
+      final exercises = store.exercises;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Home Page Title')),
-      body: ListView.builder(
-        itemCount: store.exercises.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(store.exercises[index]),
-            trailing: IconButton(
-              onPressed: (){
-                store.removeExercise(index);
+      body: store.exercises.isEmpty
+          ? const Center(child: Text('No exercises yet. Tap + and add one.'))
+          : ListView.builder(
+              itemCount: store.exercises.length,
+              itemBuilder: (context, index) {
+                final exercise = exercises[index];
+                return ListTile(
+                  title: Text(exercise.name),
+                  trailing: IconButton(
+                    onPressed: () => _confirmDelete(exercise),
+                    icon: const Icon(Icons.delete)),
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ExerciseScreen(
+                          exerciseId: exercise.id!,
+                          exerciseName: exercise.name),
+                      ),
+                    );
+                  },
+                );
               },
-              icon: const Icon(Icons.delete)),
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ExerciseScreen(exerciseName: store.exercises[index]),
-                ),
-              );
-            },
-          );
-        },
-      ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         child: const Icon(Icons.add),
       ) ,  //ListView
     ); //Scaffold
   }
+
+  void _confirmDelete(Exercise exercise){
+    final store = context.read<WorkoutStore>();
+
+    showDialog(
+      context: context,
+      builder: (context){
+        return AlertDialog(
+          title: const Text('Delete exercise'),
+          content: Text(
+            'Delete "${exercise.name}" and all its logged sets?'
+            'This cannot be undone.',
+          ),
+          actions:[
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                store.removeExercise(exercise.id!);
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
