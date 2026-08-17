@@ -116,15 +116,35 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
         padding: EdgeInsets.all(16),
         child: Column(
           children:[
-            Text('Last workout'),
-            SizedBox(height: 8),
-            if(lastWorkout.isEmpty)
-              Text('No previous workout')
-            else
-              for(var s in lastWorkout) Text('${s.weight} kg x ${s.reps}',),
-            SizedBox(height: 24),
-            Text('Add new set'),
-            SizedBox(height: 8),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Last Workout',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    if(lastWorkout.isEmpty)
+                      Text(
+                        'No Previous Workout',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      )
+                    else
+                      for(var s in lastWorkout)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Text(
+                            '${s.weight} kg x ${s.reps} reps',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ),
+                  ]
+                ),
+              ),
+            ),
+            
             Row(
               children: [            
                 Expanded(child: TextField(
@@ -134,7 +154,10 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.numberWithOptions(),
-                ),),
+                  ),
+                ),
+                
+                const SizedBox(width: 12),
 
                 Expanded(child: TextField(
                   controller: repsController,
@@ -146,25 +169,46 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                 ),),
               ]
             ),
-            
-            ElevatedButton(
-              onPressed: saveSet,
-              child: Text('Elevated Button - SAVE')
-            ),
 
-            TextButton(
-              onPressed: (){
-                Navigator.push(
-                  context, MaterialPageRoute(
-                    builder: (context) => LogScreen(
-                      exerciseId: widget.exerciseId,
-                      exerciseName: widget.exerciseName,
+            const SizedBox(height: 30),   
+            
+            Row(
+              children:[
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LogScreen(
+                            exerciseId: widget.exerciseId, 
+                            exerciseName: currentName,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'LOG',
+                      style: TextStyle(fontSize: 18),                      
                       ),
-                  )
-                );
-              },
-              child: Text('Text Button - LOG')
+                  ),
+                ),
+                
+                const SizedBox(width:12),
+                
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: saveSet,
+                    child: const Text(
+                      'SAVE',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ],
             ),
+            const SizedBox(height:50),
+
           ],
         )       
       )

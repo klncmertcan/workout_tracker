@@ -20,7 +20,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Workout Tracker',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+        colorScheme: ColorScheme.dark(
+          primary: const Color.fromARGB(255, 244, 198, 49),
+        ),
       ),
       home: const HomeScreen(),
     );

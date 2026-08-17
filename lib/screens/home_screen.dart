@@ -21,10 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('New entry.'),
+          title: const Text('New Exercise'),
           content: TextField(
             controller: controller,
-            decoration: InputDecoration(labelText: 'Input here:'),
+            decoration: InputDecoration(labelText: 'Exercise Name'),
           ),
           actions: [
             TextButton(
@@ -54,28 +54,41 @@ class _HomeScreenState extends State<HomeScreen> {
       final exercises = store.exercises;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Home Page Title')),
+      appBar: AppBar(
+        title: const Text('OVERLOAD'),
+        titleTextStyle: TextStyle(
+          letterSpacing: 7,
+          fontSize: 20,
+          ),
+        ),
       body: store.exercises.isEmpty
           ? const Center(child: Text('No exercises yet. Tap + and add one.'))
           : ListView.builder(
               itemCount: store.exercises.length,
               itemBuilder: (context, index) {
                 final exercise = exercises[index];
-                return ListTile(
-                  title: Text(exercise.name),
-                  trailing: IconButton(
-                    onPressed: () => _confirmDelete(exercise),
-                    icon: const Icon(Icons.delete)),
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ExerciseScreen(
-                          exerciseId: exercise.id!,
-                          exerciseName: exercise.name),
-                      ),
-                    );
-                  },
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical:8),
+                  child: ListTile(
+                    title: Text(
+                      exercise.name,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    trailing: IconButton(
+                      onPressed: () => _confirmDelete(exercise),
+                      icon: const Icon(Icons.delete)),
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ExerciseScreen(
+                            exerciseId: exercise.id!,
+                            exerciseName: exercise.name),
+                        ),
+                      );
+                    },
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
                 );
               },
             ),
