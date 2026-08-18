@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Workout Tracker',
+      title: 'Overload',
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
@@ -31,4 +31,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
