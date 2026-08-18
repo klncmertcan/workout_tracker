@@ -12,7 +12,10 @@ class LogScreen extends StatelessWidget {
   final int exerciseId;
   final String exerciseName;
 
-  
+  String formatWeight(double w) {
+    return w == w.roundToDouble() ? w.toStringAsFixed(0) : w.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final logs = context.watch<WorkoutStore>().currentSets;
@@ -43,7 +46,7 @@ class LogScreen extends StatelessWidget {
                     Card(
                       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       child: ListTile(
-                        title: Text('${set.weight} kg x ${set.reps}'),
+                        title: Text('${formatWeight(set.weight)} kg x ${set.reps}'),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
@@ -52,7 +55,7 @@ class LogScreen extends StatelessWidget {
                               builder: (dialogContext){
                                 return AlertDialog(
                                   title: const Text('Delete Set'),
-                                  content: Text ('Delete this set (${set.weight} kg x ${set.reps})'),
+                                  content: Text ('Delete this set (${formatWeight(set.weight)} kg x ${set.reps})'),
                                   actions: [
                                     ElevatedButton(
                                       onPressed: () => Navigator.pop(dialogContext),

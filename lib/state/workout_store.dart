@@ -64,4 +64,10 @@ class WorkoutStore extends ChangeNotifier {
     return null;
   }
 
+  bool exerciseNameExists(String name){
+    return _exercises.any(
+      (e) => e.name.toLowerCase() == name.toLowerCase(),
+    );
+  }
+
 }

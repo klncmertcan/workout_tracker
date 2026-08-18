@@ -29,11 +29,37 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     context.read<WorkoutStore>().loadLastWorkout(widget.exerciseId);
   }
 
-  void saveSet(){
-    final weight = double.tryParse(weightController.text);
-    final reps = int.tryParse(repsController.text);
+  String formatWeight(double w){
+    return w == w.roundToDouble()
+      ? w.toStringAsFixed(0)
+      : w.toString();
+  }
 
-    if(weight == null || reps == null) return;
+  void _showError(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void saveSet(){
+    final weightText = weightController.text.trim().replaceAll(',', '.');
+    final weight = double.tryParse(weightText);
+    final reps = int.tryParse(repsController.text.trim());
+
+    if(weight == null || reps == null){
+      _showError('Enter both weight and reps');
+      return;
+    }
+
+    if(weight <= 0 || reps <= 0){
+      _showError('Weight and reps must be greater than zero');
+      return; 
+    }
+
+    if(weight >= 1000 || reps >= 1000){
+      _showError('Value too large');
+      return;
+    }
 
     final store = context.read<WorkoutStore>();
     final today = DateTime.now().toIso8601String().substring(0, 10);      // YYYY-MM-DD
@@ -68,8 +94,9 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       context: context,
       builder: (dialogContext){
         return AlertDialog(
-          title: const Text('Rename exercise'),
+          title: const Text('Rename Exercise'),
           content: TextField(
+            maxLength: 50,
             controller: controller,
             decoration: const InputDecoration(labelText: 'Exercise name'),
           ),
@@ -81,6 +108,11 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
             ElevatedButton(
               onPressed: () {
                 final newName = controller.text.trim();
+                if(newName.toLowerCase() != widget.exerciseName.toLowerCase() && 
+                  store.exerciseNameExists(newName)){
+                    _showError('Exercsie already exists');
+                    return;
+                  }
                 if(newName.isNotEmpty){
                   store.renameExercise(widget.exerciseId, newName);
                 }
@@ -97,7 +129,6 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<WorkoutStore>();
-    final sets = store.currentSets;
     final lastWorkout = store.lastWorkout;
     final currentName = store.exerciseById(widget.exerciseId)?.name ?? widget.exerciseName;
 
@@ -136,7 +167,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Text(
-                            '${s.weight} kg x ${s.reps} reps',
+                            '${formatWeight(s.weight)} kg x ${s.reps} reps',
                             style: Theme.of(context).textTheme.headlineMedium,
                           ),
                         ),
@@ -153,7 +184,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                     labelText: 'Weight',
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.numberWithOptions(),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   ),
                 ),
                 
@@ -165,12 +196,12 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                     labelText: 'Reps',
                     border:OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.numberWithOptions(),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),),
               ]
             ),
 
-            const SizedBox(height: 30),   
+            const SizedBox(height: 12),   
             
             Row(
               children:[

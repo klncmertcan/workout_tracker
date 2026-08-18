@@ -19,11 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: const Text('New Exercise'),
           content: TextField(
             controller: controller,
+            maxLength: 50,
             decoration: InputDecoration(labelText: 'Exercise Name'),
           ),
           actions: [
@@ -34,10 +35,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: (){
                 final name = controller.text.trim();
-                if(name.isNotEmpty){
-                  store.addExercise(name);
+                if(name.isEmpty){
+                  return;
                 }
-                Navigator.pop(context);
+                if(store.exerciseNameExists(name)){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('An exercise with this name already exists')),
+                  );
+                  return;
+                }
+                store.addExercise(name);
+                Navigator.pop(dialogContext);
+
               },
               child: const Text('Add'),
             ),
@@ -95,8 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         child: const Icon(Icons.add),
-      ) ,  //ListView
-    ); //Scaffold
+      ) ,  
+    ); 
   }
 
   void _confirmDelete(Exercise exercise){
