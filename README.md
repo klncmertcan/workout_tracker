@@ -1,17 +1,23 @@
-# workout_tracker
 
-A new Flutter project.
+# OVERLOAD
 
-## Getting Started
+A workout tracking app built with Flutter. Log your sets and see your last 
+workout for each exercise, so you can beat it
 
-This project is a starting point for a Flutter application.
+## Features
+- Exercise library with add, rename nad delete operations.
+- Log weight, reps, and sets per exercise
+- See you most recent workout for each exercise
+- Full exercise history grouped by date
+- Fully offline
 
-A few resources to get you started if this is your first Flutter project:
+## Stack
+- Flutter (Dart)
+- SQLite via sqflite
+- Provider for state management 
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running locally
+'''bash
+flutter pub get
+flutter run
+'''
