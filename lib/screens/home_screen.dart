@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'exercise_screen.dart';
 import '/state/workout_store.dart';
 import '../models/exercise.dart';
+import '../widgets/dialogs.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -13,48 +14,18 @@ class HomeScreen extends StatefulWidget{
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  void _showAddDialog(){
-    final controller = TextEditingController();
-    final store = context.read<WorkoutStore>(); 
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('New Exercise'),
-          content: TextField(
-            controller: controller,
-            maxLength: 50,
-            decoration: InputDecoration(labelText: 'Exercise Name'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: (){
-                final name = controller.text.trim();
-                if(name.isEmpty){
-                  return;
-                }
-                if(store.exerciseNameExists(name)){
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('An exercise with this name already exists')),
-                  );
-                  return;
-                }
-                store.addExercise(name);
-                Navigator.pop(dialogContext);
-
-              },
-              child: const Text('Add'),
-            ),
-          ],
-
-        );
-      }
+  Future<void> _addExercise() async {
+    final store = context.read<WorkoutStore>();
+    final name = await showTextInputDialog(
+      context,
+      title: 'New exercise',
+      label: 'Exercise name',
+      confirmLabel: 'Add',
+      validator: (value) => store.exerciseNameExists(value)
+          ? 'An exercise with this name already exists'
+          : null,
     );
+    if (name != null) store.addExercise(name);
   }
   
   @override
@@ -84,7 +55,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     trailing: IconButton(
-                      onPressed: () => _confirmDelete(exercise),
+                      onPressed: () async {
+                        final confirmed = await showConfirmDialog(
+                          context,
+                          title: 'Delete exercise',
+                          message: 'Delete "${exercise.name}" and all its logged sets? This cannot be undone.',
+                        );
+                        if (confirmed) store.removeExercise(exercise.id!);
+                      },
                       icon: const Icon(Icons.delete)),
                     onTap: (){
                       Navigator.push(
@@ -102,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddDialog,
+        onPressed: _addExercise,
         child: const Icon(Icons.add),
       ) ,  
     ); 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/workout_store.dart';
-import 'package:intl/intl.dart';
+import '../utils/format.dart';
+import '../widgets/dialogs.dart';
 
 class LogScreen extends StatelessWidget {
   const LogScreen({
@@ -11,10 +12,6 @@ class LogScreen extends StatelessWidget {
 
   final int exerciseId;
   final String exerciseName;
-
-  String formatWeight(double w) {
-    return w == w.roundToDouble() ? w.toStringAsFixed(0) : w.toString();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +35,7 @@ class LogScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical:4),
                         child: Text(
-                          DateFormat('EEEE, MMM d').format(DateTime.parse(set.date)),
+                          formatWorkoutDate(set.date),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
@@ -49,30 +46,15 @@ class LogScreen extends StatelessWidget {
                         title: Text('${formatWeight(set.weight)} kg x ${set.reps}'),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (dialogContext){
-                                return AlertDialog(
-                                  title: const Text('Delete Set'),
-                                  content: Text ('Delete this set (${formatWeight(set.weight)} kg x ${set.reps})'),
-                                  actions: [
-                                    ElevatedButton(
-                                      onPressed: () => Navigator.pop(dialogContext),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        context.read<WorkoutStore>().removeSet(set.id!, exerciseId);
-                                        Navigator.pop(dialogContext);
-                                      },
-                                      child: const Text('Delete'),
-                                      ),
-                                  ]
-                                );
-                              },
-                              );
-                          },
+                          onPressed: () async {
+                            final store = context.read<WorkoutStore>();
+                            final confirmed = await showConfirmDialog(
+                              context,
+                              title: 'Delete set',
+                              message: 'Delete this set (${formatWeight(set.weight)} kg x ${set.reps})?',
+                            );
+                            if (confirmed) store.removeSet(set.id!, exerciseId);
+                          }
                         ),
                       ),
                     ),

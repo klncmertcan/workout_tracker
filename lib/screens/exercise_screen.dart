@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:workout_tracker/models/logged_set.dart';
 import 'log_screen.dart';
 import '../state/workout_store.dart';
-
+import '../utils/format.dart';
+import '../widgets/dialogs.dart';
 
 class ExerciseScreen extends StatefulWidget {
   const ExerciseScreen({
@@ -21,18 +22,15 @@ class ExerciseScreen extends StatefulWidget {
 class _ExerciseScreenState extends State<ExerciseScreen> {
   final weightController = TextEditingController();
   final repsController = TextEditingController();
+  final bottomButtonStyle = ElevatedButton.styleFrom(
+    padding: const EdgeInsets.symmetric(vertical: 20),
+  );
 
   @override
   void initState(){
     super.initState();
     context.read<WorkoutStore>().loadSetsFor(widget.exerciseId);
     context.read<WorkoutStore>().loadLastWorkout(widget.exerciseId);
-  }
-
-  String formatWeight(double w){
-    return w == w.roundToDouble()
-      ? w.toStringAsFixed(0)
-      : w.toString();
   }
 
   void _showError(String message){
@@ -62,7 +60,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     }
 
     final store = context.read<WorkoutStore>();
-    final today = DateTime.now().toIso8601String().substring(0, 10);      // YYYY-MM-DD
+    final today = todayAsDbDate();
     final setNumber = store.currentSets.length + 1;
 
     final newSet = LoggedSet(
@@ -86,45 +84,26 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     super.dispose();
   }
 
-  void _showRenameDialog(){
-    final controller = TextEditingController(text: widget.exerciseName);
+  Future<void> _renameExercise() async {
     final store = context.read<WorkoutStore>();
+    final currentName =
+        store.exerciseById(widget.exerciseId)?.name ?? widget.exerciseName;
 
-    showDialog(
-      context: context,
-      builder: (dialogContext){
-        return AlertDialog(
-          title: const Text('Rename Exercise'),
-          content: TextField(
-            maxLength: 50,
-            controller: controller,
-            decoration: const InputDecoration(labelText: 'Exercise name'),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.pop(dialogContext), 
-              child: const Text('Cancel'),
-              ),
-            ElevatedButton(
-              onPressed: () {
-                final newName = controller.text.trim();
-                if(newName.toLowerCase() != widget.exerciseName.toLowerCase() && 
-                  store.exerciseNameExists(newName)){
-                    _showError('Exercsie already exists');
-                    return;
-                  }
-                if(newName.isNotEmpty){
-                  store.renameExercise(widget.exerciseId, newName);
-                }
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+    final newName = await showTextInputDialog(
+      context,
+      title: 'Rename exercise',
+      label: 'Exercise name',
+      confirmLabel: 'Save',
+      initialValue: currentName,
+      validator: (value) =>
+          value.toLowerCase() != currentName.toLowerCase() &&
+                  store.exerciseNameExists(value)
+              ? 'An exercise with this name already exists'
+              : null,
     );
+    if (newName != null) store.renameExercise(widget.exerciseId, newName);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +118,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: _showRenameDialog,
+            onPressed: _renameExercise,
           ),
         ],  
       ),
