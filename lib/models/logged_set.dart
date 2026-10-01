@@ -6,10 +6,16 @@ class LoggedSet {
   final int setNumber;
   final int exerciseId;
 
-  LoggedSet({this.id, required this.weight, required this.reps,
-            required this.date, required this.setNumber, required this.exerciseId});
+  LoggedSet({
+    this.id,
+    required this.weight,
+    required this.reps,
+    required this.date,
+    required this.setNumber,
+    required this.exerciseId,
+  });
 
-  factory LoggedSet.fromMap(Map<String, dynamic> map){
+  factory LoggedSet.fromMap(Map<String, dynamic> map) {
     return LoggedSet(
       id: map['set_id'] as int?,
       weight: map['weight'] as double,
@@ -20,8 +26,8 @@ class LoggedSet {
     );
   }
 
-  Map<String, dynamic> toMap(){
-    return{
+  Map<String, dynamic> toMap() {
+    return {
       'set_id': id,
       'weight': weight,
       'reps': reps,
@@ -29,7 +35,5 @@ class LoggedSet {
       'set_number': setNumber,
       'exercise_id': exerciseId,
     };
-    
   }
-
 }

@@ -62,9 +62,9 @@ Future<String?> showTextInputDialog(
 
             final error = validator?.call(value);
             if (error != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(error)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(error)));
               return;
             }
             Navigator.pop(dialogContext, value);

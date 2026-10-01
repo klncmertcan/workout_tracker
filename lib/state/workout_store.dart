@@ -12,7 +12,8 @@ class WorkoutStore extends ChangeNotifier {
   List<LoggedSet> _lastWorkout = [];
   List<LoggedSet> get lastWorkout => List.unmodifiable(_lastWorkout);
 
-  Future<void> loadExercises() async {                    // Load from disk at the app start
+  Future<void> loadExercises() async {
+    // Load from disk at the app start
     _exercises = await _repo.getExercises();
     notifyListeners();
   }
@@ -27,10 +28,12 @@ class WorkoutStore extends ChangeNotifier {
     await loadExercises();
   }
 
-  List<LoggedSet> _currentSets = [];                                     
-  List<LoggedSet> get currentSets => List.unmodifiable(_currentSets); // Holds sets in memory temporarily
+  List<LoggedSet> _currentSets = [];
+  List<LoggedSet> get currentSets =>
+      List.unmodifiable(_currentSets); // Holds sets in memory temporarily
 
-  Future<void> loadSetsFor(int exerciseId) async {                    // Load sets from memory
+  Future<void> loadSetsFor(int exerciseId) async {
+    // Load sets from memory
     _currentSets = await _repo.getSetsForExercise(exerciseId);
     notifyListeners();
   }
@@ -57,17 +60,14 @@ class WorkoutStore extends ChangeNotifier {
     await loadExercises();
   }
 
-  Exercise? exerciseById(int id){
-    for(final e in _exercises){
-      if(e.id == id) return e;
+  Exercise? exerciseById(int id) {
+    for (final e in _exercises) {
+      if (e.id == id) return e;
     }
     return null;
   }
 
-  bool exerciseNameExists(String name){
-    return _exercises.any(
-      (e) => e.name.toLowerCase() == name.toLowerCase(),
-    );
+  bool exerciseNameExists(String name) {
+    return _exercises.any((e) => e.name.toLowerCase() == name.toLowerCase());
   }
-
 }
